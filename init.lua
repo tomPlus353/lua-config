@@ -125,3 +125,36 @@ hs.hotkey.bind({"cmd", "option"}, "D", function()
         hs.eventtap.keyStroke({"cmd", "alt"}, "D")
     end
 end)
+
+-- Map Cmd+alt+o to "Close Other Tabs" in browser (with debug logs)
+hs.hotkey.bind({"cmd", "option"}, "O", function()
+    local app = hs.application.frontmostApplication()
+    if not app then
+        hs.alert("No frontmost app")
+        hs.console.printStyledtext("No frontmost application found\n")
+        return
+    end
+
+    local appName = app:name()
+    hs.console.printStyledtext("Hotkey pressed. Frontmost app: " .. appName .. "\n")
+    local targetAppArray = {"Google Chrome", "Microsoft Edge", "Brave Browser", "Vivaldi", "Opera"}
+    if isInArray(targetAppArray, appName) then
+        local browser = hs.application.get(appName)
+        if browser then
+            local ok = browser:selectMenuItem({"Tab", "Close Other Tabs"})
+            if ok then
+                hs.alert("Closed other tabs")
+                hs.console.printStyledtext("Successfully triggered menu item\n")
+            else
+                hs.alert("Menu item not found")
+                hs.console.printStyledtext("Failed to find menu item: {Tab -> Close Other Tabs}\n")
+            end
+        else
+            hs.console.printStyledtext("Failed to get browser application object\n")
+        end
+    else
+        -- Fallback: send normal Cmd+Option+O
+        hs.console.printStyledtext("Passing through Cmd+Option+O to " .. appName .. "\n")
+        hs.eventtap.keyStroke({"cmd", "alt"}, "O")
+    end
+end)
