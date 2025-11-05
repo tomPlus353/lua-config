@@ -26,135 +26,51 @@ local function isInArray (targetArray, val)
     return false
 end
 
+local function bindBrowserMenuShortcut(modifiers, modifierKey, subMenuName, menuItemName)
+    -- set default arguments
+    modifiers = modifiers or {"cmd", "alt"}
+    subMenuName = subMenuName or "Tab"
+    
+    -- adjust modifier to uppercase first letter if needed
+    modifierKey = string.upper(modifierKey)
 
--- Map Cmd+Option+W to "Close Tabs to the Right" in browser (with debug logs)
-hs.hotkey.bind({"cmd", "alt"}, "W", function()
-    local app = hs.application.frontmostApplication()
-    if not app then
-        hs.alert("No frontmost app")
-        hs.console.printStyledtext("No frontmost application found\n")
-        return
-    end
-
+     -- Map the hotkey to the browser menu item (with debug logs)
+    hs.hotkey.bind(modifiers, modifierKey, function()
+        local app = hs.application.frontmostApplication()
+        if not app then
+            hs.alert("No frontmost app")
+            hs.console.printStyledtext("No frontmost application found\n")
+            return
+        end -- end of if not app
+    
     local appName = app:name()
     hs.console.printStyledtext("Hotkey pressed. Frontmost app: " .. appName .. "\n")
     local targetAppArray = {"Google Chrome", "Microsoft Edge", "Brave Browser", "Vivaldi", "Opera"}
     if isInArray(targetAppArray, appName) then
         local browser = hs.application.get(appName)
         if browser then
-            local ok = browser:selectMenuItem({"Tab", "Close Tabs to the Right"})
+            local ok = browser:selectMenuItem({subMenuName, menuItemName})
             if ok then
-                hs.alert("Closed tabs to the right")
+                hs.alert("Successfully triggered:  '".. menuItemName .. "'\n")
                 hs.console.printStyledtext("Successfully triggered menu item\n")
             else
                 hs.alert("Menu item not found")
-                hs.console.printStyledtext("Failed to find menu item: {Tab -> Close Tabs to the Right}\n")
+                hs.console.printStyledtext("Failed to find menu item: {" .. subMenuName .. " -> " .. menuItemName .. "}\n")
             end
         else
             hs.console.printStyledtext("Failed to get browser application object\n")
         end
     else
-        -- Fallback: send normal Cmd+Option+W
-        hs.console.printStyledtext("Passing through Cmd+Option+W to " .. appName .. "\n")
-        hs.eventtap.keyStroke({"cmd", "alt"}, "W")
-    end
-end)
-
--- Map Cmd+T to "New Tab to the Right" in browser (with debug logs)
-hs.hotkey.bind({"cmd"}, "T", function()
-    local app = hs.application.frontmostApplication()
-    if not app then
-        hs.alert("No frontmost app")
-        hs.console.printStyledtext("No frontmost application found\n")
-        return
+        -- Fallback: send normal keys
+        hs.console.printStyledtext("Passing through modifiers: " .. modifiers .. "and hotkey: " .. modifierKey .. " to " .. appName .. "\n")
+        hs.eventtap.keyStroke(modifiers, modifierKey)
     end
 
-    local appName = app:name()
-    hs.console.printStyledtext("Hotkey pressed. Frontmost app: " .. appName .. "\n")
-    local targetAppArray = {"Google Chrome", "Microsoft Edge", "Brave Browser", "Vivaldi", "Opera"}
-    if isInArray(targetAppArray, appName) then
-        local browser = hs.application.get(appName)
-        if browser then
-            local ok = browser:selectMenuItem({"Tab", "New Tab to the Right"})
-            if ok then
-                hs.alert("Opened new tab to the right")
-                hs.console.printStyledtext("Successfully triggered menu item\n")
-            else
-                hs.alert("Menu item not found")
-                hs.console.printStyledtext("Failed to find menu item: {Tab -> New Tab to the Right}\n")
-            end
-        else
-            hs.console.printStyledtext("Failed to get browser application object\n")
-        end
-    else
-        -- Fallback: send normal Cmd+Option+W
-        hs.console.printStyledtext("Passing through Cmd+T to " .. appName .. "\n")
-        hs.eventtap.keyStroke({"cmd"}, "T")
-    end
-end)
+    end) -- end of hotkey.bind
+end -- end of bindBrowserMenuShortcut function
 
--- Map Cmd+alt+D to "Duplicate Tab" in browser (with debug logs)
-hs.hotkey.bind({"cmd", "option"}, "D", function()
-    local app = hs.application.frontmostApplication()
-    if not app then
-        hs.alert("No frontmost app")
-        hs.console.printStyledtext("No frontmost application found\n")
-        return
-    end
-
-    local appName = app:name()
-    hs.console.printStyledtext("Hotkey pressed. Frontmost app: " .. appName .. "\n")
-    local targetAppArray = {"Google Chrome", "Microsoft Edge", "Brave Browser", "Vivaldi", "Opera"}
-    if isInArray(targetAppArray, appName) then
-        local browser = hs.application.get(appName)
-        if browser then
-            local ok = browser:selectMenuItem({"Tab", "Duplicate Tab"})
-            if ok then
-                hs.alert("Duplicated Tab")
-                hs.console.printStyledtext("Successfully triggered menu item\n")
-            else
-                hs.alert("Menu item not found")
-                hs.console.printStyledtext("Failed to find menu item: {Tab -> Duplicate Tab}\n")
-            end
-        else
-            hs.console.printStyledtext("Failed to get browser application object\n")
-        end
-    else
-        -- Fallback: send normal Cmd+Option+W
-        hs.console.printStyledtext("Passing through Cmd+Option+D to " .. appName .. "\n")
-        hs.eventtap.keyStroke({"cmd", "alt"}, "D")
-    end
-end)
-
--- Map Cmd+alt+o to "Close Other Tabs" in browser (with debug logs)
-hs.hotkey.bind({"cmd", "option"}, "O", function()
-    local app = hs.application.frontmostApplication()
-    if not app then
-        hs.alert("No frontmost app")
-        hs.console.printStyledtext("No frontmost application found\n")
-        return
-    end
-
-    local appName = app:name()
-    hs.console.printStyledtext("Hotkey pressed. Frontmost app: " .. appName .. "\n")
-    local targetAppArray = {"Google Chrome", "Microsoft Edge", "Brave Browser", "Vivaldi", "Opera"}
-    if isInArray(targetAppArray, appName) then
-        local browser = hs.application.get(appName)
-        if browser then
-            local ok = browser:selectMenuItem({"Tab", "Close Other Tabs"})
-            if ok then
-                hs.alert("Closed other tabs")
-                hs.console.printStyledtext("Successfully triggered menu item\n")
-            else
-                hs.alert("Menu item not found")
-                hs.console.printStyledtext("Failed to find menu item: {Tab -> Close Other Tabs}\n")
-            end
-        else
-            hs.console.printStyledtext("Failed to get browser application object\n")
-        end
-    else
-        -- Fallback: send normal Cmd+Option+O
-        hs.console.printStyledtext("Passing through Cmd+Option+O to " .. appName .. "\n")
-        hs.eventtap.keyStroke({"cmd", "alt"}, "O")
-    end
-end)
+-- Bind specific browser menu shortcuts
+bindBrowserMenuShortcut({"cmd", "alt"}, "W", "Tab", "Close Tabs to the Right")
+bindBrowserMenuShortcut({"cmd"}, "T", "Tab", "New Tab to the Right")
+bindBrowserMenuShortcut({"cmd", "alt"}, "D", "Tab", "Duplicate Tab")
+bindBrowserMenuShortcut({"cmd", "alt"}, "O", "Tab", "Close Other Tabs")
